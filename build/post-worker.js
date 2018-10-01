@@ -1,5 +1,3 @@
-  return __ffmpegjs_return;
-}
 
 var __ffmpegjs_running = false;
 

@@ -306,16 +306,22 @@ build/ffmpeg-mp4/ffmpeg.bc: $(MP4_SHARED_DEPS)
 # for simple tests and 32M tends to run slower than 64M.
 EMCC_COMMON_ARGS = \
 	--closure 1 \
-	-s TOTAL_MEMORY=67108864 \
-	-s OUTLINING_LIMIT=20000 \
-	-O3 --memory-init-file 0 \
 	--pre-js $(PRE_JS) \
+	-s EXPORT_NAME=ffmpegjs \
+	-s AGGRESSIVE_VARIABLE_ELIMINATION=1 \
+	-s ALLOW_MEMORY_GROWTH=1 \
+	-s MODULARIZE=1 \
+	-s WASM=1 \
+	-O3 --memory-init-file 0 \
 	-o $@
+  
+#	-s TOTAL_MEMORY=67108864 \
+#       -s OUTLINING_LIMIT=20000 \
 
 ffmpeg-webm.js: $(FFMPEG_WEBM_BC) $(PRE_JS) $(POST_JS_SYNC)
 	emcc $(FFMPEG_WEBM_BC) $(WEBM_SHARED_DEPS) \
 		--post-js $(POST_JS_SYNC) \
-		$(EMCC_COMMON_ARGS)
+		$(EMCC_COMMON_ARGS)		
 
 ffmpeg-worker-webm.js: $(FFMPEG_WEBM_BC) $(PRE_JS) $(POST_JS_WORKER)
 	emcc $(FFMPEG_WEBM_BC) $(WEBM_SHARED_DEPS) \

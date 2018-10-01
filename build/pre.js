@@ -1,10 +1,10 @@
 var __ffmpegjs_utf8ToStr;
 
-function __ffmpegjs(__ffmpegjs_opts) {
+//function __ffmpegjs(__ffmpegjs_opts) {
   __ffmpegjs_utf8ToStr = UTF8ArrayToString;
-  __ffmpegjs_opts = __ffmpegjs_opts || {};
-  var __ffmpegjs_return;
-  var Module = {};
+//  __ffmpegjs_opts = __ffmpegjs_opts || {};
+ // var __ffmpegjs_return;
+  //var Module = {};
 
   function __ffmpegjs_toU8(data) {
     if (Array.isArray(data) || data instanceof ArrayBuffer) {
@@ -19,31 +19,31 @@ function __ffmpegjs(__ffmpegjs_opts) {
     return data;
   }
 
-  Object.keys(__ffmpegjs_opts).forEach(function(key) {
-    if (key != "mounts" && key != "MEMFS") {
-      Module[key] = __ffmpegjs_opts[key];
-    }
-  });
+//  Object.keys(__ffmpegjs_opts).forEach(function(key) {
+//    if (key != "mounts" && key != "MEMFS") {
+//      Module[key] = __ffmpegjs_opts[key];
+//    }
+//  });
 
   // XXX(Kagami): Prevent Emscripten to call `process.exit` at the end of
   // execution on Node.
   // There is no longer `NODE_STDOUT_FLUSH_WORKAROUND` and it seems to
   // be the best way to accomplish that.
-  Module["preInit"] = function() {
-    if (ENVIRONMENT_IS_NODE) {
-      exit = Module["exit"] = function(status) {
-        ABORT = true;
-        EXITSTATUS = status;
-        STACKTOP = initialStackTop;
-        exitRuntime();
-        if (Module["onExit"]) Module["onExit"](status);
-        throw new ExitStatus(status);
-      };
-    }
-  };
+//  Module["preInit"] = function() {
+//    if (ENVIRONMENT_IS_NODE) {
+//      exit = Module["exit"] = function(status) {
+//        ABORT = true;
+//        EXITSTATUS = status;
+//        STACKTOP = initialStackTop;
+//        exitRuntime();
+//        if (Module["onExit"]) Module["onExit"](status);
+//        throw new ExitStatus(status);
+//      };
+//    }
+ // };
 
   Module["preRun"] = function() {
-    (__ffmpegjs_opts["mounts"] || []).forEach(function(mount) {
+    (Module["mounts"] || []).forEach(function(mount) {
       var fs = FS.filesystems[mount["type"]];
       if (!fs) {
         throw new Error("Bad mount type");
@@ -67,7 +67,7 @@ function __ffmpegjs(__ffmpegjs_opts) {
     FS.mkdir("/work");
     FS.chdir("/work");
 
-    (__ffmpegjs_opts["MEMFS"] || []).forEach(function(file) {
+    (Module["MEMFS"] || []).forEach(function(file) {
       if (file["name"].match(/\//)) {
         throw new Error("Bad file name");
       }
@@ -97,7 +97,7 @@ function __ffmpegjs(__ffmpegjs_opts) {
     }
 
     var inFiles = Object.create(null);
-    (__ffmpegjs_opts["MEMFS"] || []).forEach(function(file) {
+    (Module["MEMFS"] || []).forEach(function(file) {
       inFiles[file.name] = null;
     });
     var outFiles = listFiles("/work").filter(function(file) {
@@ -106,5 +106,14 @@ function __ffmpegjs(__ffmpegjs_opts) {
       var data = __ffmpegjs_toU8(file.contents);
       return {"name": file.name, "data": data};
     });
-    __ffmpegjs_return = {"MEMFS": outFiles};
+    
+    if("onfilesready" in Module) {
+      Module["onfilesready"]({"MEMFS": outFiles});
+    }
   };
+
+//  return __ffmpegjs_return;
+//}
+
+//__ffmpegjs();
+console.log('running pre.js')

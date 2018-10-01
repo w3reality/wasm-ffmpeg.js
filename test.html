@@ -1,0 +1,33 @@
+<script src='./ffmpeg-webm.js'></script>
+<input type=file accept="video/*" id=input>
+
+<script>
+input.onchange = (e) => {
+  let file = e.target.files[0];
+  let fileReader = new FileReader();
+  fileReader.onload = (e) => {
+    var stdout = "";
+    var stderr = "";
+
+    ffmpegjs.onfilesready = console.log;
+
+    let result = ffmpegjs({
+      arguments: ['-y','-i', file.name, 'output.webm'],
+      MEMFS: [{name: file.name, data: e.target.result}],
+      stdin: () => {},
+      onfilesready: (e) => {
+        console.log('ready', e)
+      },
+      print: function(data) { console.log(data); stdout += data + "\n"; },
+      printErr: function(data) { console.log('error', data); stderr += data + "\n"; },
+      postRun: function(result) { console.log('DONE', result); },
+      onExit: function(code) {
+        console.log("Process exited with code " + code);
+        console.log(stdout);
+      },
+    });
+    console.log(result);
+  };
+  fileReader.readAsArrayBuffer(file);
+};
+</script>
