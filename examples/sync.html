@@ -1,21 +1,21 @@
 <script src='./ffmpeg-webm.js'></script>
 <input type=file accept="video/*" id=input>
+<video id=output autoplay style="width:100%;" controls></video>
 
 <script>
-input.onchange = (e) => {
+input.onchange = async (e) => {
   let file = e.target.files[0];
-  let fileReader = new FileReader();
-  fileReader.onload = (e) => {
-    var stdout = "";
-    var stderr = "";
+  let data = await new Response(file).arrayBuffer();
+  let stderr="";
+  let stdout="";
 
-    ffmpegjs.onfilesready = console.log;
-
-    let result = ffmpegjs({
+  let result = ffmpegjs({
       arguments: ['-y','-i', file.name, 'output.webm'],
-      MEMFS: [{name: file.name, data: e.target.result}],
+      MEMFS: [{name: file.name, data: data}],
       stdin: () => {},
       onfilesready: (e) => {
+        let data = e.MEMFS[0].data;
+        output.src = URL.createObjectURL(new Blob([data]))
         console.log('ready', e)
       },
       print: function(data) { console.log(data); stdout += data + "\n"; },
@@ -26,8 +26,7 @@ input.onchange = (e) => {
         console.log(stdout);
       },
     });
-    console.log(result);
-  };
-  fileReader.readAsArrayBuffer(file);
+
+  console.log(result);
 };
 </script>
