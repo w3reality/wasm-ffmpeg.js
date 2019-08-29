@@ -2,7 +2,8 @@
 # You need emsdk environment installed and activated, see:
 # <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>.
 
-PRE_JS = build/pre.POST_JS_SYNC
+#PRE_JS = build/pre.POST_JS_SYNC
+PRE_JS = build/pre.js
 
 COMMON_FILTERS = aresample scale crop overlay
 COMMON_DEMUXERS = matroska ogg avi mov flv mpegps image2 mp3 concat
@@ -316,12 +317,19 @@ EMCC_COMMON_ARGS = \
 #	-s TOTAL_MEMORY=67108864 \
 #       -s OUTLINING_LIMIT=20000 \
 
-ffmpeg-webm.js: $(FFMPEG_WEBM_BC) $(PRE_JS) $(POST_JS_SYNC)
+#ffmpeg-webm.js: $(FFMPEG_WEBM_BC) $(PRE_JS) $(POST_JS_SYNC)
+#	emcc $(FFMPEG_WEBM_BC) $(WEBM_SHARED_DEPS) \
+#		--post-js $(POST_JS_SYNC) \
+#		$(EMCC_COMMON_ARGS)
+ffmpeg-webm.js: $(FFMPEG_WEBM_BC) $(PRE_JS)
 	emcc $(FFMPEG_WEBM_BC) $(WEBM_SHARED_DEPS) \
-		--post-js $(POST_JS_SYNC) \
-		$(EMCC_COMMON_ARGS)		
-
-ffmpeg-mp4.js: $(FFMPEG_MP4_BC) $(PRE_JS) $(POST_JS_SYNC)
-	emcc $(FFMPEG_MP4_BC) $(MP4_SHARED_DEPS) \
-		--post-js $(POST_JS_SYNC) \
 		$(EMCC_COMMON_ARGS)
+
+#ffmpeg-mp4.js: $(FFMPEG_MP4_BC) $(PRE_JS) $(POST_JS_SYNC)
+#	emcc $(FFMPEG_MP4_BC) $(MP4_SHARED_DEPS) \
+#		--post-js $(POST_JS_SYNC) \
+#		$(EMCC_COMMON_ARGS)
+ffmpeg-mp4.js: $(FFMPEG_MP4_BC) $(PRE_JS)
+	emcc $(FFMPEG_MP4_BC) $(MP4_SHARED_DEPS) \
+		$(EMCC_COMMON_ARGS)
+
