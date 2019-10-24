@@ -4,6 +4,8 @@
 
 <script>
 input.onchange = async (e) => {
+  let timeBegin = performance.now();
+  console.log('begin at:', timeBegin);
   let file = e.target.files[0];
   let data = await new Response(file).arrayBuffer();
   let stderr="";
@@ -17,6 +19,9 @@ input.onchange = async (e) => {
         let data = e.MEMFS[0].data;
         output.src = URL.createObjectURL(new Blob([data]))
         console.log('ready', e)
+        let timeEnd = performance.now();
+        console.log('end at:', timeEnd);
+        console.log('took (s):', (timeEnd - timeBegin)/1000);
       },
       print: function(data) { console.log(data); stdout += data + "\n"; },
       printErr: function(data) { console.log('error', data); stderr += data + "\n"; },
